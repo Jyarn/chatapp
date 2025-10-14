@@ -12,7 +12,7 @@ function isValidString(str) {
 }
 
 usersRouter.post("/login", async (req, res) => {
-  if (!isValidString(req.body.username) && !isValidString(req.body.password))
+  if (!isValidString(req.body.username) || !isValidString(req.body.password))
     return res.status(400).json({ error: "Missing username or password." });
 
   const userPassword = users.get(req.body.username);
@@ -23,7 +23,7 @@ usersRouter.post("/login", async (req, res) => {
 });
 
 usersRouter.post("/signup", async (req, res) => {
-  if (!isValidString(req.body.username) && !isValidString(req.body.password))
+  if (!isValidString(req.body.username) || !isValidString(req.body.password))
     return res.status(400).json({ error: "Missing username or password." });
   else if (users.get(req.body.username))
     return res.status(422).json({ error: "User already exists." });

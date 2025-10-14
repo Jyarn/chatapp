@@ -1,4 +1,5 @@
 import express from "express";
+import "dotenv/config";
 
 import { usersRouter } from "./routers/users_router.js";
 
