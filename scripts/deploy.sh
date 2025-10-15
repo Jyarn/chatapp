@@ -1,3 +1,3 @@
 #!/bin/sh
+source .env
 docker compose up --build -d
-./scripts/test.sh
