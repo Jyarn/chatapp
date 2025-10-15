@@ -7,11 +7,9 @@ const app = express();
 
 app.use(express.json());
 
-app.use(express.static("../frontend/"));
 app.use("/users", usersRouter);
 
-const PORT = 3000;
-app.listen(PORT, (err) => {
+app.listen(process.env.BACKEND_PORT, (err) => {
   if (err) console.error(`Unable to connect: ${err}`);
-  else console.log(`Connected to port ${PORT}.`);
+  else console.log(`Connected to port ${process.env.BACKEND_PORT}.`);
 })
