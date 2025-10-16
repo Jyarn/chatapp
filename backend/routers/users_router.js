@@ -1,14 +1,19 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import assert from "node:assert";
 
 import { pool } from "../db.js";
+import { isAuth } from "../middleware.js";
+import { isValidString } from "../utils.js";
 
 export const usersRouter = Router();
 
 const SALT_ROUNDS = 10;
 
-function isValidString(str) {
-  return str && typeof str === "string" && str !== '';
+function issueToken(user) {
+  assert(process.env.JWT_SECRET.length > 16);
+  return jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 }
 
 usersRouter.post("/login", async (req, res) => {
@@ -23,16 +28,16 @@ usersRouter.post("/login", async (req, res) => {
     const queryResult= await pool.query(`
         SELECT user_id, password
         FROM users
-        WHERE username=$1
+        WHERE username=$1 AND email=$2
         LIMIT 1;
       `,
-      [req.body.username]);
+      [req.body.username, req.body.email]);
 
     if (queryResult.rows.length === 0 || !bcrypt.compareSync(req.body.password, queryResult.rows[0].password))
       return res.status(403).json({ error: "Incorrect login details." });
 
     return res.status(200).json({
-      user_id: queryResult.rows[0].user_id
+      jwt: issueToken(queryResult.rows[0])
     });
 
   } catch (err) {
@@ -41,11 +46,12 @@ usersRouter.post("/login", async (req, res) => {
   }
 });
 
+
 usersRouter.post("/signup", async (req, res) => {
   if (!isValidString(req.body.username) ||
       !isValidString(req.body.password) ||
       !isValidString(req.body.email))
-    return res.status(401).json({ error: "Missing username or password." });
+    return res.status(400).json({ error: "Missing username or password." });
   else if (!/\w+@\w+.(ca|com)/.test(req.body.email))
     return res.status(400).json({ error: "Invalid email." });
 
@@ -71,12 +77,12 @@ usersRouter.post("/signup", async (req, res) => {
       `,
       [req.body.username, req.body.email, hashedPassword]);
 
-    const { user_id } = queryResult.rows[0];
-    return res.status(200).json({ user_id });
+    return res.status(200).json({
+      jwt: issueToken(queryResult.rows[0])
+    });
 
   } catch (err){
     console.error(err);
     return res.status(500).json({ error: "Internal Server Error." });
   }
-
 });

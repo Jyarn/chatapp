@@ -1,6 +1,8 @@
 require('dotenv').config({ path: "../../.env" });
 const host = `${process.env.BACKEND_DOMAIN}:${process.env.BACKEND_PORT}`;
 
+const jwt = require('jsonwebtoken');
+
 let params;
 
 beforeEach(() => {
@@ -67,6 +69,11 @@ test("signup w/ valid params", async () => {
   params.body = '{ "username": "username", "password": "password", "email": "username@email.com"}';
   const res = await fetch(`${host}/users/signup`, params);
   expect(res.status).toBe(200);
+
+  const json = await res.json();
+  jwt.verify(json.jwt, process.env.JWT_SECRET, (err) => {
+    expect(err).toBe(null);
+  })
 });
 
 
@@ -89,4 +96,9 @@ test("login w/ valid user", async () => {
   params.body = '{ "username": "username", "password": "password", "email": "username@email.com"}';
   const res = await fetch(`${host}/users/login`, params);
   expect(res.status).toBe(200);
+
+  const json = await res.json();
+  jwt.verify(json.jwt, process.env.JWT_SECRET, (err) => {
+    expect(err).toBe(null);
+  })
 });

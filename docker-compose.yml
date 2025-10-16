@@ -27,6 +27,8 @@ services:
           - tests/
           - app.js
           - db.js
+          - middleware.js
+          - utils.js
 
   postgres:
     image: postgres
