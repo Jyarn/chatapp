@@ -15,7 +15,7 @@ export class App {
   private router = inject(Router);
 
   constructor() {
-    console.log(environment.backendUrl);
+    if (environment.inDev) console.log("DEBUG");
   }
 
   gotoLogin(): void {

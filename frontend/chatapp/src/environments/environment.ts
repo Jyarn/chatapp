@@ -1,3 +1,4 @@
 export const environment = {
-  backendUrl: "dog"
+  inDev: false,
+  backendUrl: "http://localhost:3000"
 };

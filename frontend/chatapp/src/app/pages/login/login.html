@@ -1,0 +1,10 @@
+<form [formGroup]="loginGroup">
+  <h1>Login</h1>
+  <input type="text" formControlName="username" placeholder="username"/>
+  <input type="text" formControlName="email" placeholder="email"/>
+  <input type="password" formControlName="password" placeholder="password"/>
+
+  @if (loginGroup.valid) {
+    <button type="submit" (click)="onSubmit()">Submit</button>
+  }
+</form>
